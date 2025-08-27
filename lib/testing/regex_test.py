@@ -1,36 +1,60 @@
-from distutils.filelist import findall
+# lib/testing/regex_test.py
+import pytest
+from lib.regex import name_regex, phone_regex, email_regex, sentence_regex
 import re
 
-from regex import my_regex
+class TestRegex:
+    # ----------------------------
+    # Name Regex Tests
+    # ----------------------------
+    def test_name_valid(self):
+        assert re.match(name_regex, "John Doe")
+        assert re.match(name_regex, "Alice Johnson")
+        assert re.match(name_regex, "Mary Anne Smith")
 
-FINDALL_STRING = """
-    It's such a lovely day today.
-    Where'd all the time go?
-    Some weather we're having today, huh?
-    Tomorrow never knows!
-    Maybe today's just not my day.
-    It's clobbering time!
-"""
+    def test_name_invalid(self):
+        assert not re.match(name_regex, "john doe")
+        assert not re.match(name_regex, "JOHN DOE")
+        assert not re.match(name_regex, "Alice1 Johnson")
 
-class TestRegEx:
-    '''my_regex in regex.py'''
+    # ----------------------------
+    # Phone Regex Tests
+    # ----------------------------
+    def test_phone_valid(self):
+        assert re.match(phone_regex, "123-456-7890")
+        assert re.match(phone_regex, "(123) 456-7890")
+        assert re.match(phone_regex, "1234567890")
+        assert re.match(phone_regex, "123 456 7890")
 
-    def test_matches_its_such_a_lovely_day(self):
-        '''matches the string "It's such a lovely day today."'''
-        assert(my_regex.fullmatch("It's such a lovely day today."))
+    def test_phone_invalid(self):
+        assert not re.match(phone_regex, "12-3456-7890")
+        assert not re.match(phone_regex, "123-45-67890")
+        assert not re.match(phone_regex, "phone1234567890")
 
-    def test_matches_some_weather_were_having(self):
-        '''matches the string "Some weather we're having today, huh?"'''
-        assert(my_regex.fullmatch("Some weather we're having today, huh?"))
+    # ----------------------------
+    # Email Regex Tests
+    # ----------------------------
+    def test_email_valid(self):
+        assert re.match(email_regex, "john@example.com")
+        assert re.match(email_regex, "alice.johnson@school.org")
+        assert re.match(email_regex, "user-name@domain.co.uk")
 
-    def test_matches_maybe_todays_not_my_day(self):
-        '''matches the string "Maybe today's just not my day."'''
-        assert(my_regex.fullmatch("Maybe today's just not my day."))
+    def test_email_invalid(self):
+        assert not re.match(email_regex, "john@example")
+        assert not re.match(email_regex, "john@.com")
+        assert not re.match(email_regex, "john@@example.com")
+        assert not re.match(email_regex, "john example.com")
 
-    def test_finds_all_matches(self):
-        '''can be used to find these three strings and ONLY these three strings.'''
-        assert(my_regex.findall(FINDALL_STRING) == [
-            "It's such a lovely day today.",
-            "Some weather we're having today, huh?",
-            "Maybe today's just not my day.",
-        ])
+    # ----------------------------
+    # Sentence Regex Tests (BONUS)
+    # ----------------------------
+    def test_sentence_valid(self):
+        text = "It's such a lovely day today."
+        matches = re.findall(sentence_regex, text)
+        assert "It's such a lovely day today." in matches
+
+    def test_sentence_invalid(self):
+        text = "This sentence has #invalid$ characters!"
+        matches = re.findall(sentence_regex, text)
+        assert "#" not in matches[0]
+        assert "$" not in matches[0]
